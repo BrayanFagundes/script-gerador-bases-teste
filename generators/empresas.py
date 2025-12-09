@@ -7,7 +7,7 @@ def gerar_empresas(qtd):
 
 def insert_empresas(empresas):
     # query para inserir empresas no banco
-    query = "INSERT INTO empresas (nome, cnpj) VALUES (%s, %s)"
+    query = "INSERT INTO empresa (nome, cnpj) VALUES (%s, %s)"
 
     # monta os valores na ordem da query acima
     values = [(e["nome"], e["cnpj"]) for e in empresas]

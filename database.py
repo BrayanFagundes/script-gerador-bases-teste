@@ -1,11 +1,37 @@
-import mysql.connector
+import os
+
+try:
+    import mysql.connector
+except ModuleNotFoundError:
+    raise ModuleNotFoundError(
+        "mysql-connector-python is not installed. Run: python -m pip install mysql-connector-python"
+    )
+
 
 def get_connection():
+    """Create a MySQL connection using environment variables with sensible defaults.
+
+    Set these environment variables to override defaults:
+    - DB_HOST (default: 'localhost')
+    - DB_PORT (default: 3305)
+    - DB_USER (default: 'admin')
+    - DB_PASSWORD (default: 'dix1bolt')
+    - DB_NAME (default: 'desenvolvimento')
+
+    If your database runs on a non-standard port (e.g. 3305), set `DB_PORT=3305`.
+    """
+    host = os.getenv("DB_HOST", "localhost")
+    port = int(os.getenv("DB_PORT", "3305"))
+    user = os.getenv("DB_USER", "admin")
+    password = os.getenv("DB_PASSWORD", "dix1bolt")
+    database = os.getenv("DB_NAME", "desenvolvimento")
+
     return mysql.connector.connect(
-        host="127.0.0.1", # Não consegui rodar localhost, coloquei o enderço do banco, verificar como usar localhost
-        user="root",
-        password="Pass1234@", # Em uma aplicação real não pdoeria aparecer a senha, ver um jeito de arrumar isso
-        database="base_teste" # Nome banco que está sendo inserido
+        host=host,
+        port=port,
+        user=user,
+        password=password,
+        database=database,
     )
 
 # Função para inserir dados que NÃO PRECISAM retornar o ID

@@ -1,7 +1,7 @@
 CONFIG = {
-    "qtd_empresas": 10,
-    "qtd_funcionarios": 50,
+    "qtd_empresa": 10,
+    "qtd_funcionario": 50,
     "qtd_marcacoes": 40,
-    "dias_marcacoes": 10,
+    "dias_marcacao": 10,
     "variacao_minutos": 9
 }

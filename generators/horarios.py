@@ -1,22 +1,33 @@
-def gerar_horarios(funcionarios):
-    # gera uma lista de horários padrão para cada funcionário
-    return [{
-        "funcionario_id": f["id"],   # pega o id do funcionário
-        "entrada": "08:00",          # horário fixo de entrada
-        "intervalo_saida": "12:00",  # horário de saída pro almoço
-        "intervalo_retorno": "13:00",# volta do almoço
-        "saida": "17:00"             # fim do expediente
-    } for f in funcionarios]         # repete isso pra cada funcionário
+"""Compatibilidade: wrapper para o gerador/insert de `horario`.
+
+Algumas versões antigas do projeto usavam módulos/pluralizações `horarios`.
+Este arquivo traduz chamadas antigas para os geradores atuais em `horario.py`.
+"""
+from .horario import gerar_horarios as gerar_horarios_new, insert_horarios as insert_horarios_new
+
+
+def gerar_horarios(funcionarios_or_empresas):
+    """Aceita tanto `empresas` quanto `funcionarios`.
+
+    - Se receber empresas (cada item com chave `id`), usa gerador novo diretamente.
+    - Se receber funcionários (cada item com `id` e possivelmente `empresa_id`), cria um horário "por funcionário"
+      transformando em entradas de `horario` (descrição) para compatibilidade.
+    """
+    # Detecta se são empresas (possui chave 'razaoSocial' ou 'idTipoDocumentoCadastro')
+    if funcionarios_or_empresas and isinstance(funcionarios_or_empresas, list):
+        first = funcionarios_or_empresas[0]
+        if isinstance(first, dict) and ("razaoSocial" in first or "idTipoDocumentoCadastro" in first):
+            return gerar_horarios_new(funcionarios_or_empresas)
+
+    # Caso sejam funcionários, converte para uma lista de 'horario' por empresa fictícia
+    horarios = []
+    for f in funcionarios_or_empresas:
+        descricao = f"Horário padrão do funcionário {f.get('id', f.get('registro_id', 'unknown'))}"
+        horarios.append({"descricao": descricao, "idSituacaoCadastro": 1})
+
+    return horarios
 
 
 def insert_horarios(horarios):
-    # query SQL para inserir os horários no banco
-    query = """INSERT INTO horarios 
-    (funcionario_id, entrada, intervalo_saida, intervalo_retorno, saida)
-    VALUES (%s, %s, %s, %s, %s)"""
-
-    # monta a lista de valores na ordem exata que o SQL precisa
-    values = [(h["funcionario_id"], h["entrada"], h["intervalo_saida"], h["intervalo_retorno"], h["saida"]) 
-              for h in horarios]
-
-    return query, values   # envia a query e os valores pro insert
+    """Apenas delega ao insert_horarios do módulo novo (mesma assinatura)."""
+    return insert_horarios_new(horarios)
